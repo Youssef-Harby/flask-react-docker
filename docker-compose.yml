@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: react-flask-app-api
+    ports:
+      - 5000:5000
+# Comment ports (apove 2 lines) for internal requistes only and not expose:5000 the api for public/host
+# We can remove it on production
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    image: react-flask-app-client
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3000:80"

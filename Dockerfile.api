@@ -1,0 +1,28 @@
+# This Dockerfile builds the API only.
+
+FROM python:3.9
+WORKDIR /app
+
+COPY api/requirements.txt api/api.py api/.flaskenv ./
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update \
+  && apt-get install -y libgomp1 \
+    ffmpeg libsm6 libxext6 \
+    git \
+    build-essential \
+    gdal-bin libgdal-dev 
+RUN export CPLUS_INCLUDE_PATH=/usr/include/gdal
+RUN export C_INCLUDE_PATH=/usr/include/gdal
+
+# pip install
+RUN pip install --upgrade pip
+RUN pip install -r ./requirements.txt
+ENV FLASK_ENV production
+
+EXPOSE 5000
+CMD ["gunicorn", "-b", ":5000", "api:app"]
